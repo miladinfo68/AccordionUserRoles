@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Vue</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+	<style type="text/css">
+
+	</style>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+	<script src="content/js/vue.js"></script>
+	<script src="content/js/axios.js"></script>
+</head>
+<body>
+	<div id='myapp'>		
+		<table border='1' width='80%' style='border-collapse: collapse;'>
+			<tr>
+				<th>Username</th>
+				<th>Name</th>
+				<th>Email</th>
+				<th>Action</th>
+			</tr>
+
+			<!-- Add -->
+			<tr>
+				<td><input type='text' v-model='username'></td>
+				<td><input type='text' v-model='name'></td>
+				<td><input type='text' v-model='email'></td>
+				<td><input type='button' value='Add' @click='addRecord();'></td>
+			</tr>
+
+			<!-- Update/Delete -->
+			<tr v-for='(user,index) in users'>
+				<td><input type='text' v-model='user.username' ></td>
+				<td><input type='text' v-model='user.name' ></td>
+				<td><input type='text' v-model='user.email' ></td>
+				<td>
+					<input type='button' value='Update' @click='updateRecord(index,user.id);'>&nbsp;
+					<input type='button' value='Delete' @click='deleteRecord(index,user.id)'>
+				</td>
+			</tr>
+		</table>
+
+	</div>
+	<script type="text/javascript">
+		var app = new Vue({
+			el: '#myapp',
+			data: {
+				users: "",
+				username: "",
+				name: "",
+				email: ""
+			},
+			methods: {
+				allRecords: function(){
+					axios.post('localhost:8081/crud.php', {
+						request: 1
+					}).then(function (response) {
+						app.users = response.data;
+					}).catch(function (error) {
+						console.log(error);
+					});
+
+				},
+				addRecord: function(){
+
+					if(this.username != '' && this.name != '' && this.email != ''){
+						axios.post('crud.php', {
+							request: 2,
+							username: this.username,
+							name: this.name,
+							email: this.email
+						}).then(function (response) {
+         					// Fetch records
+         					app.allRecords();
+
+					         // Empty values
+					         app.username = '';
+					         app.name = '';
+					         app.email = '';
+
+					         alert(response.data);
+					     }).catch(function (error) {
+					     	console.log(error);
+					     });
+					 }else{
+					 	alert('Fill all fields.');
+					 }
+					},
+				
+				updateRecord: function(index,id){
+
+				     // Read value from Textbox
+				     var name = this.users[index].name;
+				     var email = this.users[index].email;
+				     if(name !='' && email !=''){
+				     	axios.post('crud.php', {
+				     		request: 3,
+				     		id: id,
+				     		name: name,
+				     		email: email
+				     	}).then(function (response) {
+				     		alert(response.data);
+				     	}).catch(function (error) {
+				     		console.log(error);
+				     	});
+				     }
+				 },
+
+				 deleteRecord: function(index,id){
+				 	axios.post('crud.php', {
+				 		request: 4,
+				 		id: id
+				 	}).then(function (response) {
+				       // Remove index from users
+				       app.users.splice(index, 1);
+				       alert(response.data);
+				   }).catch(function (error) {
+				   	console.log(error);
+				   });
+				} 
+			},
+			
+			created: function(){
+				this.allRecords();
+			}
+		});
+
+	</script>
+</body>
+</html>

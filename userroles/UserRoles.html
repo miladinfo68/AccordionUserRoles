@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="content/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="content/css/font-awesome.min.css">
+	<script type="text/javascript" src="content/js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript">
+		
+		var users=[
+		{'userId':1 ,'userName':'milad' ,'displayNameUser':'milad jalali'},
+		{'userId':2 ,'userName':'sara' ,'displayNameUser':'sara mahdavi'},
+		{'userId':3 ,'userName':'hamid' ,'displayNameUser':'hamid jalali'},
+		{'userId':4 ,'userName':'reza' ,'displayNameUser':'reza bagheri'},
+		{'userId':5 ,'userName':'zahra' ,'displayNameUser':'zahra alavi'},
+		{'userId':6 ,'userName':'boss' ,'displayNameUser':'strong boss'}
+		];
+
+		var roles=[
+		{'roleId':100 ,'roleName':'ISR_Expert' ,'displayNameRole':'ISR Expert' } ,
+		{'roleId':101 ,'roleName':'ISR_Manager' ,'displayNameRole':'ISR Manager'} ,
+		{'roleId':102 ,'roleName':'Enrollment_Expert' ,'displayNameRole':'Enrollment Expert'} ,
+		{'roleId':103 ,'roleName':'Enrollment_Manager' ,'displayNameRole':'Enrollment Manager'} ,
+		{'roleId':104 ,'roleName':'Admin' ,'displayNameRole':'Admin Sys'} ,
+		{'roleId':105 ,'roleName':'Guest' ,'displayNameRole':'Ordinal User'} ,
+		];
+
+		var usersRoles=[
+		{'urId':1 , 'userId':1 ,'roleId':100 },
+		{'urId':2 , 'userId':1 ,'roleId':101 },
+		{'urId':3 , 'userId':2 ,'roleId':100 },
+		{'urId':4 , 'userId':3 ,'roleId':102 },
+		{'urId':5 , 'userId':4 ,'roleId':102 },
+		{'urId':6 , 'userId':4 ,'roleId':103 },
+		{'urId':7 , 'userId':5 ,'roleId':104 },
+		{'urId':8 , 'userId':5 ,'roleId':105 },
+		{'urId':9 , 'userId':6 ,'roleId':104 },
+		];
+
+		function generator() {
+			var html=`<div class="usersWrapper"><div class="users">`;
+			var checked="";
+			for(user of users){
+				html +=`<div class="user_item"><a data-userId="`+user.userId+`">`;
+				html +=`<div class="row"><div class="col-md-11">`+user.displayNameUser+`</div>`
+				html+=`<div class="col-md-1"><i class="fa fa-plus"></i></div></div></a>`;
+				html+=`<div class="row trigger user_roles_display_none">`;				
+				for(var role of roles){
+					html+=`<div class="col-sm-6 "><label>`+role.displayNameRole+`</label>`
+					
+					var countOfIsChecked=$.grep(usersRoles, function(ur) { 
+						return ur.userId==user.userId && ur.roleId==role.roleId 
+					});
+
+					checked=countOfIsChecked.length>0 ? "checked" : "";
+					
+					html+=`<input type="checkbox" `+checked+` data-roleId="`+role.roleId+`" /></div>`
+				}
+				html+=`<div class="w-100"></div>`
+				html+=`<input type="button" value="ثبت تغییرات" class="w-100" 
+				id="btnUserId_`+user.userId+`" data-userId=`+user.userId+` /></div></div>`;
+			}
+			html+=`</div></div>`
+			$(".root").html('');
+			$(".root").append(html);
+		}
+
+		// function getAllUserAndRoles(){
+		// 	var userAndRoles=[];
+		// 	for(var user of users){
+		// 		usersRoles.filter(ur=>{
+		// 			if(user.userId==ur.userId){
+		// 				roles.filter(role=>{
+		// 					if(role.roleId==ur.roleId){
+		// 						userAndRoles.push({'userId' :user.userId ,'userName':user.userName,'displayNameUser':user.displayNameUser
+		// 							,'roleId':role.roleId,'roleName':role.roleName ,'displayNameRole':role.displayNameRole ,'active':role.active});
+
+		// 						 // console.log({'userId' :user.userId ,'userName':user.userName,'displayNameUser':user.displayNameUser
+		// 						 // 	,'roleId':role.roleId,'roleName':role.roleName ,'displayNameRole':role.displayNameRole ,'active':role.active});
+
+		// 						};
+		// 					});
+		// 			}
+		// 		});
+		// 	}
+		// }
+
+		$(function(){
+			//getAllUserAndRoles();
+			
+			generator();
+
+			$(".user_item a").on("click" ,function (e) {
+				e.preventDefault();
+				var $a= $(this);				
+
+				if($a.find("i").hasClass("fa-plus")){
+					$a.find("i").removeClass("fa-plus").addClass("fa-minus");
+				}else{
+					$a.find("i").removeClass("fa-minus").addClass("fa-plus");
+				}				
+
+				$a.siblings(".trigger").slideToggle();
+			});
+
+			$("input[type='button']").on("click" ,function (e) {
+				var checkedRoles=[];
+				$.each($(this).siblings().find(":checked"),(index,val)=>{				
+					checkedRoles.push($(val).attr("data-roleid"));
+				});
+				var uId=$(this).attr("data-userId");
+				//console.log("userId="+uId +" roles =====> "+checkedRoles.join(","));
+			});
+
+		});
+
+	</script>
+	<style type="text/css">
+	*{padding: 0 ;margin: 0;}
+	.root{
+		position: fixed;
+		width: 100%;
+		height: 100%;    
+		bottom: 0px;
+		background-color: #c3c3c3;
+		overflow: auto;
+	}
+	.users{
+		width: 50%;   
+		margin: auto;
+		margin-top: 100px;
+		padding: 10px;
+		border: 5px solid #ccc;
+	}
+	.user_item{
+		border-bottom: 1px solid #fff;
+		border-radius: 2px;
+		/*box-shadow: 1px 1px 1px 1px #aeafb3;*/
+	}
+
+	.user_item a{
+		display: block;
+		width: 100%;
+		background: #505365;
+		text-align: center;   
+		line-height: 30px;
+		color: #fff;
+	}
+	.user_item a:hover{
+		cursor: pointer;
+	}
+
+	.user_roles_display_none{
+		display: none;
+	}
+	.display_show{
+		display: flex;
+	}
+
+	.trigger{
+		background-color: #76757b;
+		color: #fff;
+		width: 100%;
+		margin: 0;
+		padding: 10px;
+
+	}
+	.trigger input[type=checkbox]{
+		margin-left: 10px;
+		transform: scale(1.2);
+	}
+
+	.trigger input[type=button]{
+		color: #021423;
+		font-size: 16px;
+		font-weight: bold;
+	}
+	.hight{
+		margin: 10px 0;
+	}
+	.w-100{
+		width: 100%;
+	}
+</style>
+</head>
+<body>
+	<div class="root">
+		<!-- <div class="users">
+			<div class="user_item">
+				<a data-userId="">
+					<div class="row">						
+						<div class="col-md-11"> User 1</div>
+						<div class="col-md-1"><i class="fa fa-plus"></i></div>
+					</div>
+				</a>	
+				<div class="row trigger user_roles_display_none">	
+
+					<div class="col-sm-3 ">
+						<label>ISR Expert</label>
+						<input type="checkbox" checked="" data-roleId="" />
+					</div>
+					<div class="col-sm-3">
+						<label>ISR Expert</label>
+						<input type="checkbox">
+					</div>
+					<div class="col-sm-3">
+						<label>ISR Expert</label>
+						<input type="checkbox">
+					</div>
+					<div class="col-sm-3">
+						<label>ISR Expert</label>
+						<input type="checkbox">
+					</div>
+					<div class="col-sm-3">
+						<label>ISR Expert</label>
+						<input type="checkbox">
+					</div>
+					<div class="w-100"></div>						
+					<input type="button" value="تایید" class="w-100" />
+				</div> 
+			</div>				
+		</div> -->	
+	</div>	
+</body>
+</html>
